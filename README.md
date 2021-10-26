@@ -4,7 +4,7 @@ A set of Python tools to for parametrizing the kernel in a Gaussian Process by n
 ### Usage
 There are two vital files included in this repo 
 - DeepKernel.py contains the kernel parametrized by neural networks. To change anything about the kernel, look here. This kernel is compatable woth GPyTorch (https://gpytorch.ai).
-- Train.py contains the code to train the model via MLE. Note that the model in Train.py outputs both a case count prediction and a hotspot (binary) prediction.
+- Train.py contains the code to train the model via MLE. Note that the model in Train.py outputs both a case count prediction and a hotspot (binary) prediction. In this example we use a variational strategy to reduce the computational burden.
 
 ### Examples
 
