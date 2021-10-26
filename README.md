@@ -8,7 +8,7 @@ There are two vital files included in this repo
 
 ### Examples
 
-A simple example of how to train a model
+A simple example of how to train a model with the neural kernel.
 
 ```
 # Training data loader
