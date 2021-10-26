@@ -1,4 +1,4 @@
-# Deep Neural Kernel for Gaussian Process Regression Classification
+# Deep Neural Kernel for Gaussian Process Regression and Classification
 A set of Python tools to for parametrizing the kernel in a Gaussian Process by neural networks.
 
 ### Usage
