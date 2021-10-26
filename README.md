@@ -40,4 +40,7 @@ model, _, _ = train_MLE_bernoulli(
 
 ### Visualizations
 
+![Image of Yaktocat](https://github.com/abukharin3/Neural-Kernel/visualizations/SpatialKernel4.png)
+
+
 Neural Kernel implementation from https://arxiv.org/pdf/2106.00072.pdf
