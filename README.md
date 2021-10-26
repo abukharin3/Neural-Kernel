@@ -44,5 +44,5 @@ model, _, _ = train_MLE_bernoulli(
 
 ![Image of Spatial Prediction](https://github.com/abukharin3/Neural-Kernel/blob/master/visualizations/model_36.png)
 
-
-Neural Kernel implementation from https://arxiv.org/pdf/2106.00072.pdf
+### References
+Original paper at https://arxiv.org/pdf/2106.00072.pdf.
