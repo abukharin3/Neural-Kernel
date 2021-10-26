@@ -48,7 +48,7 @@ class STVA(Mean):
 		mean = torch.nn.functional.softplus(mean)       # [ n_batches ]
 		return mean
 
-class VanillaGP(ApproximateGP):
+class DeepGP(ApproximateGP):
 	"""
 	Gaussian Process Model for COVID-19    
 	"""
@@ -61,15 +61,9 @@ class VanillaGP(ApproximateGP):
 		# posterior distribution for inducing points
 		variational_distribution = CholeskyVariationalDistribution(inducing_x.size(0))
 		variational_strategy     = VariationalStrategy(self, inducing_x, variational_distribution, learn_inducing_locations=True)
-		super(VanillaGP, self).__init__(variational_strategy)
+		super(DeepGP, self).__init__(variational_strategy)
 		self.mean_module  = STVA(n_features)
-		# TODO: CUSTOMINZED KERNEL
-		# self.covar_module = gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel(active_dims=torch.tensor([0]))) * \
-		#     gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel(active_dims=torch.tensor([1]))) * \
-		#     gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel(active_dims=torch.tensor([2])))
-		# self.covar_module = DeepNonstationarySpatiotemporalKernel(active_dims=torch.tensor([1, 2]))
 		self.covar_module = DeepNonstationarySpatiotemporalKernel()
-		# self.covar_module = gpytorch.kernels.ProductStructureKernel(gpytorch.kernels.RBFKernel(), num_dims=1)
 
 	def forward(self, x):
 		x_feature = x[:, 4:].clone() # spatio-temporal index
@@ -540,7 +534,7 @@ if __name__ == "__main__":
 	inducing_x        = train_X[init_inducing_idx, :]          # randomly selected inducing points
 
 	# Define models
-	model      = VanillaGP(n_features, inducing_x=inducing_x)
+	model      = DeepGP(n_features, inducing_x=inducing_x)
 	gaussian_likelihood = gpytorch.likelihoods.GaussianLikelihood()
 	bernoulli_likelihood = gpytorch.likelihoods.BernoulliLikelihood()
 
@@ -573,7 +567,7 @@ if __name__ == "__main__":
 		inducing_x        = train_X[init_inducing_idx, :]          # randomly selected inducing points
 
 		# Define models
-		model      = VanillaGP(n_features, inducing_x=inducing_x)
+		model      = DeepGP(n_features, inducing_x=inducing_x)
 		gaussian_likelihood = gpytorch.likelihoods.GaussianLikelihood()
 		bernoulli_likelihood = gpytorch.likelihoods.BernoulliLikelihood()
 
