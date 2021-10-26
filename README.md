@@ -40,7 +40,7 @@ model, _, _ = train_MLE_bernoulli(
 
 ### Visualizations
 
-![Image of Spatial Kernel](https://github.com/abukharin3/Neural-Kernel/blob/master/visualizations/SpatialKernel4.png)
+![Image of Spatial Kernel](https://github.com/abukharin3/Neural-Kernel/blob/master/visualizations/SpatialKernel4.png =200*150)
 
 ![Image of Spatial Prediction](https://github.com/abukharin3/Neural-Kernel/blob/master/visualizations/model_36.png)
 
