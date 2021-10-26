@@ -38,4 +38,6 @@ model, _, _ = train_MLE_bernoulli(
 
 ```
 
+### Visualizations
+
 Neural Kernel implementation from https://arxiv.org/pdf/2106.00072.pdf
