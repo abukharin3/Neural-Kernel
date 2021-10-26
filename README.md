@@ -45,4 +45,4 @@ model, _, _ = train_MLE_bernoulli(
 ![Image of Spatial Prediction](https://github.com/abukharin3/Neural-Kernel/blob/master/visualizations/model_36.png)
 
 ### References
-Original paper at https://arxiv.org/pdf/2106.00072.pdf.
+Original paper at https://arxiv.org/abs/2106.00072.
