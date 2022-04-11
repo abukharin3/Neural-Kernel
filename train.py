@@ -200,11 +200,11 @@ def GP_prediction(model, gaussian_likelihood, data_loader, sigma=3):
 		# mean
 		means = [ 
 			gaussian_likelihood(model(x_batch)).mean.detach().numpy() # [ n_batches ] 
-			for x_batch, y_batch in data_loader ]
+			for x_batch, y_batch, _ in data_loader ]
 		means = np.concatenate(means, axis=0)                # [ n ]
 		# confidence interval
 		lowerbs, upperbs = [], []
-		for x_batch, y_batch in data_loader:
+		for x_batch, y_batch, _ in data_loader:
 			std  = gaussian_likelihood(model(x_batch)).stddev.mul_(sigma)
 			mean = gaussian_likelihood(model(x_batch)).mean
 			lowerb, upperb = mean.sub(std), mean.add(std)    # 2 * [ n_batches ]
@@ -254,8 +254,6 @@ def kernel_viz(locs,old_locs, model):
 	ps1 = old_locs + focus_points * 3 # * 5e-1
 	ps2 = old_locs # * 5e-1
 
-	# print(minv, maxv)
-	# print("!!!!")
 	colorscale = branca.colormap.linear.Blues_09.scale(minv, maxv)
 	m = folium.Map(
 		location=[38, -95],
@@ -387,7 +385,6 @@ def hotspot_prediction(model,bernoulli_likelihood,data_loader):
 			bernoulli_likelihood(model(x_batch)).mean.detach().numpy() # [ n_batches ] 
 			for x_batch, y_batch, _ in data_loader ]
 	means = np.concatenate(means, axis=0)                # [ n ]
-	print(means)
 
 	return means
 
@@ -548,10 +545,10 @@ if __name__ == "__main__":
 	start_week = T - 17
 	end_week   = T-2
 	p          = 2
-	#n_features = N_FEATURES
 	batch_size = 786
 
 	onestep_hotspots  = []
+	onestep_means    = []
 	onestep_lowerbs1  = []
 	onestep_uppperbs1 = []
 	onestep_lowerbs2  = []
@@ -575,11 +572,11 @@ if __name__ == "__main__":
 		# NOTE: Comment lines below if load the model from file
 		model, _, _ = train_MLE_bernoulli(
 			model, gaussian_likelihood, bernoulli_likelihood, train_loader, n, 
-			delta=1e-5,
+			delta=0.9,
 			num_epochs = 25,
 			ngd_lr     = 1e-3, 
 			adam_lr    = 1e-2,
-			print_iter = 10,
+			print_iter = 200,
 			batch_size = batch_size,
 			modelname  = modelname)
 
@@ -596,9 +593,33 @@ if __name__ == "__main__":
 		hotspots = hotspot_prediction(model, bernoulli_likelihood, test_loader)
 		hotspots   = hotspots.reshape(C[tau + p:, :].shape)
 
-		# Get the first prediction result (one-step ahead)
-		onestep_hotspots.append(hotspots[-1, :])
+		means, lowerbs1, upperbs1 = GP_prediction(model, gaussian_likelihood, test_loader, sigma=1)
+		_, lowerbs2, upperbs2     = GP_prediction(model, gaussian_likelihood, test_loader, sigma=3)
+		means   = means.reshape(C[tau+p:, :].shape)     # [ T-p, n_counties ]
+		lowerbs1 = lowerbs1.reshape(C[tau+p:, :].shape) # [ T-p, n_counties ]
+		upperbs1 = upperbs1.reshape(C[tau+p:, :].shape) # [ T-p, n_counties ]
+		lowerbs2 = lowerbs2.reshape(C[tau+p:, :].shape) # [ T-p, n_counties ]
+		upperbs2 = upperbs2.reshape(C[tau+p:, :].shape) # [ T-p, n_counties ]
 
-	# Save results
-	onestep_hotspots    = np.stack(onestep_hotspots, 0)
-	np.save("Results/onestep_hotspots.npy", onestep_hotspots)
+		 # Get the first prediction result (one-step ahead)
+		onestep_means.append(means[0, :])
+		onestep_lowerbs1.append(lowerbs1[0, :])
+		onestep_uppperbs1.append(upperbs1[0, :])
+		onestep_lowerbs2.append(lowerbs2[0, :])
+		onestep_uppperbs2.append(upperbs2[0, :])
+
+	onestep_means     = np.stack(onestep_means, 0)
+	onestep_lowerbs1  = np.stack(onestep_lowerbs1, 0)
+	onestep_uppperbs1 = np.stack(onestep_uppperbs1, 0)
+	onestep_lowerbs2  = np.stack(onestep_lowerbs2, 0)
+	onestep_uppperbs2 = np.stack(onestep_uppperbs2, 0)
+
+	# Plot Countywise one-step ahead result
+	fulton_id = I.index('13089')
+	plot_nationwide_prediction(
+    C[start_week+p:end_week+2, fulton_id], 
+    onestep_means[:, fulton_id], 
+    onestep_lowerbs1[:, fulton_id], 
+    onestep_uppperbs1[:, fulton_id], 
+    filename="One-step ahead prediction for Dekalb County, GA")
+
